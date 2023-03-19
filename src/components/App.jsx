@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { nanoid } from 'nanoid';
 import { useState, useEffect } from 'react';
 
@@ -10,13 +10,8 @@ import { Container } from './App.styled';
 
 export default function App() {
   const savedContacts = () => {
-    const savedContacts = localStorage.getItem('contacts');
-    if (savedContacts !== null) {
-      const parsedContacts = JSON.parse(savedContacts);
-
-      return parsedContacts;
-    }
-    return [];
+    const savedContacts = JSON.parse(localStorage.getItem('contacts'));
+    return savedContacts ?? [];
   };
 
   const [contacts, setContacts] = useState(savedContacts);
@@ -46,9 +41,11 @@ export default function App() {
     console.log(localStorage.getItem('contacts'));
   };
 
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filter.toLocaleLowerCase().trim())
-  );
+  const filteredContacts = useMemo(() => {
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLocaleLowerCase().trim())
+    );
+  }, [contacts, filter]);
 
   const onDelete = id => {
     setContacts(contacts.filter(contact => contact.id !== id));
